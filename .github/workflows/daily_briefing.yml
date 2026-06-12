@@ -1,0 +1,26 @@
+name: Daily Market Briefing
+
+on:
+  schedule:
+    - cron: '0 1 * * *'   # 9:00 AM Malaysia time
+  workflow_dispatch:        # manual trigger
+
+jobs:
+  send-briefing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install anthropic feedparser
+      - name: Run market briefing script
+        env:
+          ANTHROPIC_API_KEY:  ${{ secrets.ANTHROPIC_API_KEY }}
+          GMAIL_SENDER:       ${{ secrets.GMAIL_SENDER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_RECEIVER:     ${{ secrets.GMAIL_RECEIVER }}
+        run: python market_briefing.py
