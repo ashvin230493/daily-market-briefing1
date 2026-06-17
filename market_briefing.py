@@ -14,6 +14,13 @@ FEEDS = {
     "Forbes": "https://www.forbes.com/investing/feed2/",
 }
 
+ALL_RECIPIENTS = [
+    "polyreuslab@gmail.com",
+    "drvikneshwaran.arumugam@gmail.com",
+    "chandraganesan94@gmail.com",
+    "radhikadavid@gmail.com"
+]
+
 def fetch_headlines():
     results = {}
     for source, url in FEEDS.items():
@@ -70,23 +77,16 @@ def make_html(briefing_text):
 def send_email(subject, html_body):
     sender = os.environ["GMAIL_SENDER"]
     password = os.environ["GMAIL_APP_PASSWORD"]
-    receiver = os.environ["GMAIL_RECEIVER"].strip()
-    all_receivers = [
-        receiver,
-        "drvikneshwaran.arumugam@gmail.com",
-        "chandraganesan94@gmail.com",
-        "radhikadavid@gmail.com"
-    ]
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"] = sender
-    msg["To"] = ", ".join(all_receivers)
-    msg.attach(MIMEText(html_body, "html"))
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
         server.login(sender, password)
-        for r in all_receivers:
-            server.sendmail(sender, r, msg.as_string())
-    print("Email sent to " + str(all_receivers))
+        for recipient in ALL_RECIPIENTS:
+            msg = MIMEMultipart("alternative")
+            msg["Subject"] = subject
+            msg["From"] = sender
+            msg["To"] = recipient
+            msg.attach(MIMEText(html_body, "html"))
+            server.sendmail(sender, recipient, msg.as_string())
+            print("Email sent to " + recipient)
 
 def main():
     print("Fetching headlines...")
