@@ -70,7 +70,7 @@ def make_html(briefing_text):
 def send_email(subject, html_body):
     sender = os.environ["GMAIL_SENDER"]
     password = os.environ["GMAIL_APP_PASSWORD"]
-    receiver = os.environ["GMAIL_RECEIVER"]
+    receiver = os.environ["GMAIL_RECEIVER"].strip()
     all_receivers = [
         receiver,
         "drvikneshwaran.arumugam@gmail.com",
@@ -84,7 +84,8 @@ def send_email(subject, html_body):
     msg.attach(MIMEText(html_body, "html"))
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
         server.login(sender, password)
-        server.sendmail(sender, all_receivers, msg.as_string())
+        for r in all_receivers:
+            server.sendmail(sender, r, msg.as_string())
     print("Email sent to " + str(all_receivers))
 
 def main():
